@@ -24,7 +24,7 @@ public class BookController {
   }
 
   @GetMapping("/api/books")
-  public List<Book> searchBooks(@RequestParam(name = "title", required = false) String title, @RequestParam(name = "title", required = false) String author) {
+  public List<Book> searchBooks(@RequestParam(name = "title", required = false) String title, @RequestParam(name = "author", required = false) String author) {
     if (title != null && !title.isBlank()) {
       return author != null && !author.isBlank()
           ? List.of(bookService.findBookByTitleAndAuthor(title, author))
