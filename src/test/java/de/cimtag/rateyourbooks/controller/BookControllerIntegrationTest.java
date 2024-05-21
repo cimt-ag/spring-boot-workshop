@@ -99,7 +99,7 @@ class BookControllerIntegrationTest {
     mockMvc.perform(post("/api/books")
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"title\":\"Co-Intelligence\", \"author\":\"Ethan Mollick\"}"))
-        .andExpect(status().isOk())
+        .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id", is(6)))
         .andExpect(jsonPath("$.title", is("Co-Intelligence")))
         .andExpect(jsonPath("$.author", is("Ethan Mollick")));

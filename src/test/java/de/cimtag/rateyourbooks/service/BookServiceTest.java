@@ -3,7 +3,6 @@ package de.cimtag.rateyourbooks.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -12,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.cimtag.rateyourbooks.dto.BookDto;
 import de.cimtag.rateyourbooks.model.Book;
 import de.cimtag.rateyourbooks.repository.BookRepository;
 import java.util.List;
@@ -52,10 +52,10 @@ class BookServiceTest {
   void testFindBookById() {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 
-    Book foundBook = bookService.findBookById(1L);
+    BookDto foundBook = bookService.findBookById(1L);
 
     assertThat(foundBook, is(notNullValue()));
-    assertThat(foundBook.getId(), is(1L));
+    assertThat(foundBook.id(), is(1L));
   }
 
   @Test
@@ -69,10 +69,10 @@ class BookServiceTest {
   void testFindBookByTitle() {
     when(bookRepository.findByTitle("Test Title")).thenReturn(Optional.of(book));
 
-    Book foundBook = bookService.findBookByTitle("Test Title");
+    BookDto foundBook = bookService.findBookByTitle("Test Title");
 
     assertThat(foundBook, is(notNullValue()));
-    assertThat(foundBook.getTitle(), is("Test Title"));
+    assertThat(foundBook.title(), is("Test Title"));
   }
 
   @Test
@@ -86,10 +86,10 @@ class BookServiceTest {
   void testFindBookByTitleAndAuthor() {
     when(bookRepository.findByTitleAndAuthor("Test Title", "Test Author")).thenReturn(Optional.of(book));
 
-    Book foundBook = bookService.findBookByTitleAndAuthor("Test Title", "Test Author");
+    BookDto foundBook = bookService.findBookByTitleAndAuthor("Test Title", "Test Author");
     assertThat(foundBook, is(notNullValue()));
-    assertThat(foundBook.getTitle(), is("Test Title"));
-    assertThat(foundBook.getAuthor(), is("Test Author"));
+    assertThat(foundBook.title(), is("Test Title"));
+    assertThat(foundBook.author(), is("Test Author"));
   }
 
   @Test
@@ -102,40 +102,52 @@ class BookServiceTest {
   @Test
   void testFindAllBooksByAuthor() {
     Book book2 = Book.builder()
+        .title("Test Title 2")
         .author("Test Author")
         .build();
     List<Book> books = List.of(book, book2);
     when(bookRepository.findAllByAuthor("Test Author")).thenReturn(books);
 
-    List<Book> foundBooks = bookService.findAllBooksByAuthor("Test Author");
+    List<BookDto> foundBooks = bookService.findAllBooksByAuthor("Test Author");
 
     assertThat(foundBooks, hasSize(2));
-    assertThat(foundBooks, hasItem(book));
-    assertThat(foundBooks, hasItem(book2));
+    assertThat(foundBooks.getFirst().title(), is("Test Title"));
+    assertThat(foundBooks.getFirst().author(), is("Test Author"));
+    assertThat(foundBooks.get(1).title(), is("Test Title 2"));
+    assertThat(foundBooks.get(1).author(), is("Test Author"));
   }
 
   @Test
   void testFindAllBooks() {
-    Book book2 = Book.builder().build();
+    Book book2 = Book.builder()
+        .title("Test Title 2")
+        .author("Test Author")
+        .build();
     List<Book> books = List.of(book, book2);
     when(bookRepository.findAll()).thenReturn(books);
 
-    List<Book> foundBooks = bookService.findAllBooks();
+    List<BookDto> foundBooks = bookService.findAllBooks();
+
     assertThat(foundBooks, hasSize(2));
-    assertThat(foundBooks, hasItem(book));
-    assertThat(foundBooks, hasItem(book2));
+    assertThat(foundBooks.getFirst().title(), is("Test Title"));
+    assertThat(foundBooks.getFirst().author(), is("Test Author"));
+    assertThat(foundBooks.get(1).title(), is("Test Title 2"));
+    assertThat(foundBooks.get(1).author(), is("Test Author"));
   }
 
   @Test
   void testCreateBook() {
     when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-    Book createdBook = bookService.createBook(book);
+    BookDto createdBookDto = bookService.createBook(BookDto.builder()
+        .title("Test Title")
+        .author("Test Author")
+        .build());
 
-    assertThat(createdBook, is(notNullValue()));
-    assertThat(createdBook.getId(), is(1L));
-    assertThat(createdBook.getTitle(), is("Test Title"));
-    assertThat(createdBook.getAuthor(), is("Test Author"));
+    assertThat(createdBookDto, is(notNullValue()));
+    assertThat(createdBookDto.id(), is(1L));
+    assertThat(createdBookDto.title(), is("Test Title"));
+    assertThat(createdBookDto.author(), is("Test Author"));
   }
 
   @Test
@@ -151,6 +163,7 @@ class BookServiceTest {
   @Test
   void testUpdateBookBothFields() {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
+    when(bookRepository.save(any(Book.class))).thenReturn(book);
 
     bookService.updateBook(1L, createUpdateBookValues("Updated Title", "Updated Author"));
 
@@ -163,6 +176,7 @@ class BookServiceTest {
   @Test
   void testUpdateBookTitleOnly() {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
+    when(bookRepository.save(any(Book.class))).thenReturn(book);
 
     bookService.updateBook(1L, createUpdateBookValues("Updated Title", null));
 
@@ -175,6 +189,7 @@ class BookServiceTest {
   @Test
   void testUpdateBookAuthorOnly() {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
+    when(bookRepository.save(any(Book.class))).thenReturn(book);
 
     bookService.updateBook(1L, createUpdateBookValues(null, "Updated Author"));
 
@@ -187,6 +202,7 @@ class BookServiceTest {
   @Test
   void testUpdateBookNoFields() {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
+    when(bookRepository.save(any(Book.class))).thenReturn(book);
 
     bookService.updateBook(1L, createUpdateBookValues(null, null));
 
@@ -199,6 +215,7 @@ class BookServiceTest {
   @Test
   void testUpdateBookBlankFields() {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
+    when(bookRepository.save(any(Book.class))).thenReturn(book);
 
     bookService.updateBook(1L, createUpdateBookValues(" ", " "));
 
@@ -223,8 +240,8 @@ class BookServiceTest {
         .build();
   }
 
-  private Book createUpdateBookValues(String title, String author) {
-    return Book.builder()
+  private BookDto createUpdateBookValues(String title, String author) {
+    return BookDto.builder()
         .title(title)
         .author(author)
         .build();

@@ -1,5 +1,6 @@
 package de.cimtag.rateyourbooks.model;
 
+import de.cimtag.rateyourbooks.dto.BookDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,4 +27,12 @@ public class Book {
 
   private String title;
   private String author;
+
+  public BookDto toDto() {
+    return BookDto.builder()
+        .id(id)
+        .title(title)
+        .author(author)
+        .build();
+  }
 }

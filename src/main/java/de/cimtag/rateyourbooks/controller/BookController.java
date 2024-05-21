@@ -1,9 +1,11 @@
 package de.cimtag.rateyourbooks.controller;
 
-import de.cimtag.rateyourbooks.model.Book;
+import de.cimtag.rateyourbooks.dto.BookDto;
 import de.cimtag.rateyourbooks.service.BookService;
+import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,35 +24,34 @@ public class BookController {
   private final BookService bookService;
 
   @GetMapping
-  public List<Book> searchBooks(@RequestParam(required = false) String title, @RequestParam(required = false) String author) {
+  public ResponseEntity<List<BookDto>> searchBooks(@RequestParam(required = false) String title, @RequestParam(required = false) String author) {
     if (title != null && !title.isBlank()) {
-      return author != null && !author.isBlank()
-          ? List.of(bookService.findBookByTitleAndAuthor(title, author))
-          : List.of(bookService.findBookByTitle(title));
+      return author != null && !author.isBlank() ? ResponseEntity.ok(List.of(bookService.findBookByTitleAndAuthor(title, author)))
+          : ResponseEntity.ok(List.of(bookService.findBookByTitle(title)));
     }
 
-    return author != null && !author.isBlank()
-        ? bookService.findAllBooksByAuthor(author)
-        : bookService.findAllBooks();
+    return author != null && !author.isBlank() ? ResponseEntity.ok(bookService.findAllBooksByAuthor(author)) : ResponseEntity.ok(bookService.findAllBooks());
   }
 
   @GetMapping("/{id}")
-  public Book findBookById(@PathVariable Long id) {
-    return bookService.findBookById(id);
+  public ResponseEntity<BookDto> findBookById(@PathVariable Long id) {
+    return ResponseEntity.ok(bookService.findBookById(id));
   }
 
   @PostMapping
-  public Book createNewBook(@RequestBody Book book) {
-    return bookService.createBook(book);
+  public ResponseEntity<BookDto> createNewBook(@RequestBody BookDto bookDto) {
+    BookDto createdBook = bookService.createBook(bookDto);
+    return ResponseEntity.created(URI.create("/api/books/" + createdBook.id())).body(createdBook);
   }
 
   @DeleteMapping("/{id}")
-  public void deleteBook(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
     bookService.deleteBook(id);
+    return ResponseEntity.ok().build();
   }
 
   @PutMapping("/{id}")
-  public Book updateBook(@PathVariable Long id, @RequestBody Book book) {
-    return bookService.updateBook(id, book);
+  public ResponseEntity<BookDto> updateBook(@PathVariable Long id, @RequestBody BookDto bookDto) {
+    return ResponseEntity.ok(bookService.updateBook(id, bookDto));
   }
 }

@@ -1,5 +1,6 @@
 package de.cimtag.rateyourbooks.service;
 
+import de.cimtag.rateyourbooks.dto.BookDto;
 import de.cimtag.rateyourbooks.model.Book;
 import de.cimtag.rateyourbooks.repository.BookRepository;
 import java.util.List;
@@ -12,45 +13,45 @@ public class BookService {
 
   private final BookRepository bookRepository;
 
-  public Book findBookById(Long id) throws RuntimeException {
-    return bookRepository.findById(id).orElseThrow(RuntimeException::new);
+  public BookDto findBookById(Long id) throws RuntimeException {
+    return bookRepository.findById(id).orElseThrow(RuntimeException::new).toDto();
   }
 
-  public Book findBookByTitle(String title) throws RuntimeException {
-    return bookRepository.findByTitle(title).orElseThrow(RuntimeException::new);
+  public BookDto findBookByTitle(String title) throws RuntimeException {
+    return bookRepository.findByTitle(title).orElseThrow(RuntimeException::new).toDto();
   }
 
-  public Book findBookByTitleAndAuthor(String title, String author) {
-    return bookRepository.findByTitleAndAuthor(title, author).orElseThrow(RuntimeException::new);
+  public BookDto findBookByTitleAndAuthor(String title, String author) {
+    return bookRepository.findByTitleAndAuthor(title, author).orElseThrow(RuntimeException::new).toDto();
   }
 
-  public List<Book> findAllBooksByAuthor(String author) {
-    return bookRepository.findAllByAuthor(author);
+  public List<BookDto> findAllBooksByAuthor(String author) {
+    return bookRepository.findAllByAuthor(author).stream().map(Book::toDto).toList();
   }
 
-  public List<Book> findAllBooks() {
-    return bookRepository.findAll();
+  public List<BookDto> findAllBooks() {
+    return bookRepository.findAll().stream().map(Book::toDto).toList();
   }
 
-  public Book createBook(Book book) {
-    return bookRepository.save(book);
+  public BookDto createBook(BookDto bookDto) {
+    return bookRepository.save(bookDto.toEntity()).toDto();
   }
 
   public void deleteBook(Long id) {
     bookRepository.deleteById(id);
   }
 
-  public Book updateBook(Long id, Book updatedBook) {
-    Book book = this.findBookById(id);
+  public BookDto updateBook(Long id, BookDto updatedBookDto) {
+    Book existingBook = this.findBookById(id).toEntity();
 
-    if (updatedBook.getTitle() != null && !updatedBook.getTitle().isBlank()) {
-      book.setTitle(updatedBook.getTitle());
+    if (updatedBookDto.title() != null && !updatedBookDto.title().isBlank()) {
+      existingBook.setTitle(updatedBookDto.title());
     }
 
-    if (updatedBook.getAuthor() != null && !updatedBook.getAuthor().isBlank()) {
-      book.setAuthor(updatedBook.getAuthor());
+    if (updatedBookDto.author() != null && !updatedBookDto.author().isBlank()) {
+      existingBook.setAuthor(updatedBookDto.author());
     }
 
-    return bookRepository.save(book);
+    return bookRepository.save(existingBook).toDto();
   }
 }
