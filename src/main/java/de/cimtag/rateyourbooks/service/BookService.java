@@ -44,15 +44,15 @@ public class BookService {
     bookRepository.deleteById(id);
   }
 
-  public Book updateBook(Long id, Book updatedBookDto) {
+  public Book updateBook(Long id, Book updatedBook) {
     Book book = this.findBookById(id);
 
-    if (updatedBookDto.getTitle() != null && !updatedBookDto.getTitle().isBlank()) {
-      book.setTitle(updatedBookDto.getTitle());
+    if (updatedBook.getTitle() != null && !updatedBook.getTitle().isBlank()) {
+      book.setTitle(updatedBook.getTitle());
     }
 
-    if (updatedBookDto.getAuthor() != null && !updatedBookDto.getAuthor().isBlank()) {
-      book.setAuthor(updatedBookDto.getAuthor());
+    if (updatedBook.getAuthor() != null && !updatedBook.getAuthor().isBlank()) {
+      book.setAuthor(updatedBook.getAuthor());
     }
 
     return bookRepository.save(book);
