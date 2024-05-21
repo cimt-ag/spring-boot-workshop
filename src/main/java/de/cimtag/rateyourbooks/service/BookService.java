@@ -3,18 +3,14 @@ package de.cimtag.rateyourbooks.service;
 import de.cimtag.rateyourbooks.model.Book;
 import de.cimtag.rateyourbooks.repository.BookRepository;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class BookService {
 
   private final BookRepository bookRepository;
-
-  @Autowired
-  public BookService(BookRepository bookRepository) {
-    this.bookRepository = bookRepository;
-  }
 
   public Book findBookById(Long id) throws RuntimeException {
     return bookRepository.findById(id).orElseThrow(RuntimeException::new);

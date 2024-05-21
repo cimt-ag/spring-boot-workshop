@@ -41,10 +41,11 @@ class BookServiceTest {
 
   @BeforeEach
   void beforeEach() {
-    book = new Book();
-    book.setId(1L);
-    book.setTitle("Test Title");
-    book.setAuthor("Test Author");
+    book = Book.builder()
+        .id(1L)
+        .title("Test Title")
+        .author("Test Author")
+        .build();
   }
 
   @Test
@@ -100,8 +101,9 @@ class BookServiceTest {
 
   @Test
   void testFindAllBooksByAuthor() {
-    Book book2 = new Book();
-    book2.setAuthor("Test Author");
+    Book book2 = Book.builder()
+        .author("Test Author")
+        .build();
     List<Book> books = List.of(book, book2);
     when(bookRepository.findAllByAuthor("Test Author")).thenReturn(books);
 
@@ -114,7 +116,7 @@ class BookServiceTest {
 
   @Test
   void testFindAllBooks() {
-    Book book2 = new Book();
+    Book book2 = Book.builder().build();
     List<Book> books = List.of(book, book2);
     when(bookRepository.findAll()).thenReturn(books);
 
@@ -148,18 +150,9 @@ class BookServiceTest {
 
   @Test
   void testUpdateBookBothFields() {
-    Book existingBook = new Book();
-    existingBook.setId(1L);
-    existingBook.setTitle("Existing Title");
-    existingBook.setAuthor("Existing Author");
+    when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
 
-    Book updateBookValues = new Book();
-    updateBookValues.setTitle("Updated Title");
-    updateBookValues.setAuthor("Updated Author");
-
-    when(bookRepository.findById(1L)).thenReturn(Optional.of(existingBook));
-
-    bookService.updateBook(1L, updateBookValues);
+    bookService.updateBook(1L, createUpdateBookValues("Updated Title", "Updated Author"));
 
     verify(bookRepository).save(bookArgumentCaptor.capture());
 
@@ -169,17 +162,9 @@ class BookServiceTest {
 
   @Test
   void testUpdateBookTitleOnly() {
-    Book existingBook = new Book();
-    existingBook.setId(1L);
-    existingBook.setTitle("Existing Title");
-    existingBook.setAuthor("Existing Author");
+    when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
 
-    Book updateBookValues = new Book();
-    updateBookValues.setTitle("Updated Title");
-
-    when(bookRepository.findById(1L)).thenReturn(Optional.of(existingBook));
-
-    bookService.updateBook(1L, updateBookValues);
+    bookService.updateBook(1L, createUpdateBookValues("Updated Title", null));
 
     verify(bookRepository).save(bookArgumentCaptor.capture());
 
@@ -189,17 +174,9 @@ class BookServiceTest {
 
   @Test
   void testUpdateBookAuthorOnly() {
-    Book existingBook = new Book();
-    existingBook.setId(1L);
-    existingBook.setTitle("Existing Title");
-    existingBook.setAuthor("Existing Author");
+    when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
 
-    Book updateBookValues = new Book();
-    updateBookValues.setAuthor("Updated Author");
-
-    when(bookRepository.findById(1L)).thenReturn(Optional.of(existingBook));
-
-    bookService.updateBook(1L, updateBookValues);
+    bookService.updateBook(1L, createUpdateBookValues(null, "Updated Author"));
 
     verify(bookRepository).save(bookArgumentCaptor.capture());
 
@@ -209,16 +186,9 @@ class BookServiceTest {
 
   @Test
   void testUpdateBookNoFields() {
-    Book existingBook = new Book();
-    existingBook.setId(1L);
-    existingBook.setTitle("Existing Title");
-    existingBook.setAuthor("Existing Author");
+    when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
 
-    Book updateBookValues = new Book();
-
-    when(bookRepository.findById(1L)).thenReturn(Optional.of(existingBook));
-
-    bookService.updateBook(1L, updateBookValues);
+    bookService.updateBook(1L, createUpdateBookValues(null, null));
 
     verify(bookRepository).save(bookArgumentCaptor.capture());
 
@@ -228,18 +198,9 @@ class BookServiceTest {
 
   @Test
   void testUpdateBookBlankFields() {
-    Book existingBook = new Book();
-    existingBook.setId(1L);
-    existingBook.setTitle("Existing Title");
-    existingBook.setAuthor("Existing Author");
+    when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
 
-    Book updateBookValues = new Book();
-    updateBookValues.setTitle(" ");
-    updateBookValues.setAuthor(" ");
-
-    when(bookRepository.findById(1L)).thenReturn(Optional.of(existingBook));
-
-    bookService.updateBook(1L, updateBookValues);
+    bookService.updateBook(1L, createUpdateBookValues(" ", " "));
 
     verify(bookRepository).save(bookArgumentCaptor.capture());
 
@@ -249,12 +210,23 @@ class BookServiceTest {
 
   @Test
   void testUpdateBookThrowsException() {
-    Book updateBookValues = new Book();
-    updateBookValues.setTitle("Updated Title");
-    updateBookValues.setAuthor("Updated Author");
-
     when(bookRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
-    assertThrows(RuntimeException.class, () -> bookService.updateBook(1L, updateBookValues));
+    assertThrows(RuntimeException.class, () -> bookService.updateBook(1L, createUpdateBookValues("Updated Title", "Updated Author")));
+  }
+
+  private Book createExistingBook() {
+    return Book.builder()
+        .id(1L)
+        .title("Existing Title")
+        .author("Existing Author")
+        .build();
+  }
+
+  private Book createUpdateBookValues(String title, String author) {
+    return Book.builder()
+        .title(title)
+        .author(author)
+        .build();
   }
 }
