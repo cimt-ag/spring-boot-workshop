@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.cimtag.rateyourbooks.dto.BookDto;
+import de.cimtag.rateyourbooks.exception.BookNotFoundException;
 import de.cimtag.rateyourbooks.model.Book;
 import de.cimtag.rateyourbooks.repository.BookRepository;
 import java.util.List;
@@ -62,7 +63,7 @@ class BookServiceTest {
   void testFindBookByIdThrowsException() {
     when(bookRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
-    assertThrows(RuntimeException.class, () -> bookService.findBookById(1L));
+    assertThrows(BookNotFoundException.class, () -> bookService.findBookById(1L));
   }
 
   @Test
@@ -79,7 +80,7 @@ class BookServiceTest {
   void testFindBookByTitleThrowsException() {
     when(bookRepository.findByTitle(any(String.class))).thenReturn(Optional.empty());
 
-    assertThrows(RuntimeException.class, () -> bookService.findBookByTitle("Non-existent Title"));
+    assertThrows(BookNotFoundException.class, () -> bookService.findBookByTitle("Non-existent Title"));
   }
 
   @Test
@@ -96,7 +97,7 @@ class BookServiceTest {
   void testFindBookByTitleAndAuthorThrowsException() {
     when(bookRepository.findByTitleAndAuthor(any(String.class), any(String.class))).thenReturn(Optional.empty());
 
-    assertThrows(RuntimeException.class, () -> bookService.findBookByTitleAndAuthor("Non-existent Title", "Non-existent Author"));
+    assertThrows(BookNotFoundException.class, () -> bookService.findBookByTitleAndAuthor("Non-existent Title", "Non-existent Author"));
   }
 
   @Test
@@ -229,7 +230,8 @@ class BookServiceTest {
   void testUpdateBookThrowsException() {
     when(bookRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
-    assertThrows(RuntimeException.class, () -> bookService.updateBook(1L, createUpdateBookValues("Updated Title", "Updated Author")));
+    BookDto updateBookValues = createUpdateBookValues("Updated Title", "Updated Author");
+    assertThrows(BookNotFoundException.class, () -> bookService.updateBook(1L, updateBookValues));
   }
 
   private Book createExistingBook() {
