@@ -2,7 +2,6 @@ package de.cimtag.rateyourbooks.controller;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -41,6 +40,28 @@ class BookControllerIntegrationTest {
 
   @Test
   @Order(1)
+  void testSearchBooksByNonExistingTitle() throws Exception {
+    mockMvc.perform(get("/api/books").param("title", "non-existing title"))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @Order(1)
+  void testSearchBooksByNonExistingAuthor() throws Exception {
+    mockMvc.perform(get("/api/books").param("author", "non-existing author"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(0)));
+  }
+
+  @Test
+  @Order(1)
+  void testSearchBooksByNonExistingTitleAndAuthor() throws Exception {
+    mockMvc.perform((get("/api/books")).param("title", "non-existing title").param("author", "non-existing author"))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @Order(1)
   void testSearchBooksByTitleBlank() throws Exception {
     mockMvc.perform(get("/api/books").param("title", " "))
         .andExpect(status().isOk())
@@ -51,6 +72,14 @@ class BookControllerIntegrationTest {
   @Order(1)
   void testSearchBooksByAuthorBlank() throws Exception {
     mockMvc.perform(get("/api/books").param("author", " "))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(5)));
+  }
+
+  @Test
+  @Order(1)
+  void testSearchBooksByTitleAndAuthorBlank() throws Exception {
+    mockMvc.perform(get("/api/books").param("title", " ").param("author", " "))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(5)));
   }
@@ -123,8 +152,7 @@ class BookControllerIntegrationTest {
     mockMvc.perform(delete("/api/books/{id}", 1L))
         .andExpect(status().isOk());
 
-    assertThrows(Exception.class, () -> mockMvc
-        .perform(get("/api/books/{id}", 1L))
-    );
+    mockMvc.perform(get("/api/books/{id}", 1L))
+        .andExpect(status().isNotFound());
   }
 }
