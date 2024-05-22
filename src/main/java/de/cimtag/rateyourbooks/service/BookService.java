@@ -1,6 +1,7 @@
 package de.cimtag.rateyourbooks.service;
 
 import de.cimtag.rateyourbooks.dto.BookDto;
+import de.cimtag.rateyourbooks.exception.BookNotFoundException;
 import de.cimtag.rateyourbooks.model.Book;
 import de.cimtag.rateyourbooks.repository.BookRepository;
 import java.util.List;
@@ -13,16 +14,17 @@ public class BookService {
 
   private final BookRepository bookRepository;
 
-  public BookDto findBookById(Long id) throws RuntimeException {
-    return bookRepository.findById(id).orElseThrow(RuntimeException::new).toDto();
+  public BookDto findBookById(Long id) {
+    return bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book with ID " + id + " not found!")).toDto();
   }
 
-  public BookDto findBookByTitle(String title) throws RuntimeException {
-    return bookRepository.findByTitle(title).orElseThrow(RuntimeException::new).toDto();
+  public BookDto findBookByTitle(String title) {
+    return bookRepository.findByTitle(title).orElseThrow(() -> new BookNotFoundException("Book with Title " + title + " not found!")).toDto();
   }
 
   public BookDto findBookByTitleAndAuthor(String title, String author) {
-    return bookRepository.findByTitleAndAuthor(title, author).orElseThrow(RuntimeException::new).toDto();
+    return bookRepository.findByTitleAndAuthor(title, author)
+        .orElseThrow(() -> new BookNotFoundException("Book with Title " + title + " and author " + author + " not found!")).toDto();
   }
 
   public List<BookDto> findAllBooksByAuthor(String author) {
