@@ -8,6 +8,14 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementation of the BookService interface.
+ * <p>
+ * This service provides methods for various operations related to books, such as finding, creating, updating, and deleting books.
+ * </p>
+ *
+ * @author Niklas Witzel
+ */
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {

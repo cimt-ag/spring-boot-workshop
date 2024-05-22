@@ -26,6 +26,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+/**
+ * Unit tests for the BookServiceImpl class.
+ * <p>
+ * This class tests the methods of the BookServiceImpl to ensure correct functionality and exception handling.
+ * </p>
+ *
+ * @author Niklas Witzel
+ */
 @ExtendWith(MockitoExtension.class)
 class BookServiceImplTest {
 

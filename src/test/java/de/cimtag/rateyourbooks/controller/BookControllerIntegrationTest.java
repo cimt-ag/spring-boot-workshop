@@ -21,6 +21,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
+/**
+ * Integration tests for the BookController.
+ * <p>
+ * This class tests the endpoints of the BookController to ensure correct functionality.
+ * </p>
+ *
+ * @author Niklas Witzel
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Sql(scripts = "/books.sql", executionPhase = ExecutionPhase.BEFORE_TEST_CLASS)

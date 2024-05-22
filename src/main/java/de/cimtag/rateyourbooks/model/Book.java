@@ -12,6 +12,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Entity class representing a book.
+ * <p>
+ * This class is mapped to the "books" table in the database and includes fields for the book's ID, title, and author.
+ * </p>
+ *
+ * @author Niklas Witzel
+ */
 @Entity
 @Table(name = "books")
 @Getter
@@ -28,6 +36,11 @@ public class Book {
   private String title;
   private String author;
 
+  /**
+   * Converts this {@link Book} entity to a {@link BookDto}.
+   *
+   * @return a {@link BookDto} with the same properties as this {@link Book} entity
+   */
   public BookDto toDto() {
     return BookDto.builder()
         .id(id)
