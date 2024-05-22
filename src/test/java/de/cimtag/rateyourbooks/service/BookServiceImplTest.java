@@ -27,7 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class BookServiceTest {
+class BookServiceImplTest {
 
   @Mock
   private BookRepository bookRepository;
@@ -36,7 +36,7 @@ class BookServiceTest {
   private ArgumentCaptor<Book> bookArgumentCaptor;
 
   @InjectMocks
-  private BookService bookService;
+  private BookServiceImpl bookServiceImpl;
 
   private Book book;
 
@@ -53,7 +53,7 @@ class BookServiceTest {
   void testFindBookById() {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 
-    BookDto foundBook = bookService.findBookById(1L);
+    BookDto foundBook = bookServiceImpl.findBookById(1L);
 
     assertThat(foundBook, is(notNullValue()));
     assertThat(foundBook.id(), is(1L));
@@ -63,14 +63,14 @@ class BookServiceTest {
   void testFindBookByIdThrowsException() {
     when(bookRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
-    assertThrows(BookNotFoundException.class, () -> bookService.findBookById(1L));
+    assertThrows(BookNotFoundException.class, () -> bookServiceImpl.findBookById(1L));
   }
 
   @Test
   void testFindBookByTitle() {
     when(bookRepository.findByTitle("Test Title")).thenReturn(Optional.of(book));
 
-    BookDto foundBook = bookService.findBookByTitle("Test Title");
+    BookDto foundBook = bookServiceImpl.findBookByTitle("Test Title");
 
     assertThat(foundBook, is(notNullValue()));
     assertThat(foundBook.title(), is("Test Title"));
@@ -80,14 +80,14 @@ class BookServiceTest {
   void testFindBookByTitleThrowsException() {
     when(bookRepository.findByTitle(any(String.class))).thenReturn(Optional.empty());
 
-    assertThrows(BookNotFoundException.class, () -> bookService.findBookByTitle("Non-existent Title"));
+    assertThrows(BookNotFoundException.class, () -> bookServiceImpl.findBookByTitle("Non-existent Title"));
   }
 
   @Test
   void testFindBookByTitleAndAuthor() {
     when(bookRepository.findByTitleAndAuthor("Test Title", "Test Author")).thenReturn(Optional.of(book));
 
-    BookDto foundBook = bookService.findBookByTitleAndAuthor("Test Title", "Test Author");
+    BookDto foundBook = bookServiceImpl.findBookByTitleAndAuthor("Test Title", "Test Author");
     assertThat(foundBook, is(notNullValue()));
     assertThat(foundBook.title(), is("Test Title"));
     assertThat(foundBook.author(), is("Test Author"));
@@ -97,7 +97,7 @@ class BookServiceTest {
   void testFindBookByTitleAndAuthorThrowsException() {
     when(bookRepository.findByTitleAndAuthor(any(String.class), any(String.class))).thenReturn(Optional.empty());
 
-    assertThrows(BookNotFoundException.class, () -> bookService.findBookByTitleAndAuthor("Non-existent Title", "Non-existent Author"));
+    assertThrows(BookNotFoundException.class, () -> bookServiceImpl.findBookByTitleAndAuthor("Non-existent Title", "Non-existent Author"));
   }
 
   @Test
@@ -109,7 +109,7 @@ class BookServiceTest {
     List<Book> books = List.of(book, book2);
     when(bookRepository.findAllByAuthor("Test Author")).thenReturn(books);
 
-    List<BookDto> foundBooks = bookService.findAllBooksByAuthor("Test Author");
+    List<BookDto> foundBooks = bookServiceImpl.findAllBooksByAuthor("Test Author");
 
     assertThat(foundBooks, hasSize(2));
     assertThat(foundBooks.getFirst().title(), is("Test Title"));
@@ -127,7 +127,7 @@ class BookServiceTest {
     List<Book> books = List.of(book, book2);
     when(bookRepository.findAll()).thenReturn(books);
 
-    List<BookDto> foundBooks = bookService.findAllBooks();
+    List<BookDto> foundBooks = bookServiceImpl.findAllBooks();
 
     assertThat(foundBooks, hasSize(2));
     assertThat(foundBooks.getFirst().title(), is("Test Title"));
@@ -140,7 +140,7 @@ class BookServiceTest {
   void testCreateBook() {
     when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-    BookDto createdBookDto = bookService.createBook(BookDto.builder()
+    BookDto createdBookDto = bookServiceImpl.createBook(BookDto.builder()
         .title("Test Title")
         .author("Test Author")
         .build());
@@ -155,7 +155,7 @@ class BookServiceTest {
   void testDeleteBook() {
     doNothing().when(bookRepository).deleteById(any(Long.class));
 
-    bookService.deleteBook(1L);
+    bookServiceImpl.deleteBook(1L);
 
     verify(bookRepository, times(1)).deleteById(1L);
   }
@@ -166,7 +166,7 @@ class BookServiceTest {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
     when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-    bookService.updateBook(1L, createUpdateBookValues("Updated Title", "Updated Author"));
+    bookServiceImpl.updateBook(1L, createUpdateBookValues("Updated Title", "Updated Author"));
 
     verify(bookRepository).save(bookArgumentCaptor.capture());
 
@@ -179,7 +179,7 @@ class BookServiceTest {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
     when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-    bookService.updateBook(1L, createUpdateBookValues("Updated Title", null));
+    bookServiceImpl.updateBook(1L, createUpdateBookValues("Updated Title", null));
 
     verify(bookRepository).save(bookArgumentCaptor.capture());
 
@@ -192,7 +192,7 @@ class BookServiceTest {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
     when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-    bookService.updateBook(1L, createUpdateBookValues(null, "Updated Author"));
+    bookServiceImpl.updateBook(1L, createUpdateBookValues(null, "Updated Author"));
 
     verify(bookRepository).save(bookArgumentCaptor.capture());
 
@@ -205,7 +205,7 @@ class BookServiceTest {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
     when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-    bookService.updateBook(1L, createUpdateBookValues(null, null));
+    bookServiceImpl.updateBook(1L, createUpdateBookValues(null, null));
 
     verify(bookRepository).save(bookArgumentCaptor.capture());
 
@@ -218,7 +218,7 @@ class BookServiceTest {
     when(bookRepository.findById(1L)).thenReturn(Optional.of(createExistingBook()));
     when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-    bookService.updateBook(1L, createUpdateBookValues(" ", " "));
+    bookServiceImpl.updateBook(1L, createUpdateBookValues(" ", " "));
 
     verify(bookRepository).save(bookArgumentCaptor.capture());
 
@@ -231,7 +231,7 @@ class BookServiceTest {
     when(bookRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
     BookDto updateBookValues = createUpdateBookValues("Updated Title", "Updated Author");
-    assertThrows(BookNotFoundException.class, () -> bookService.updateBook(1L, updateBookValues));
+    assertThrows(BookNotFoundException.class, () -> bookServiceImpl.updateBook(1L, updateBookValues));
   }
 
   private Book createExistingBook() {
