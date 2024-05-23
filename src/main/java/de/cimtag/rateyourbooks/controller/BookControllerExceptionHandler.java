@@ -2,6 +2,7 @@ package de.cimtag.rateyourbooks.controller;
 
 import de.cimtag.rateyourbooks.dto.ErrorResponseDto;
 import de.cimtag.rateyourbooks.exception.BookNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * @author Niklas Witzel
  */
 @ControllerAdvice
+@Slf4j
 public class BookControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
   /**
@@ -28,6 +30,8 @@ public class BookControllerExceptionHandler extends ResponseEntityExceptionHandl
    */
   @ExceptionHandler(BookNotFoundException.class)
   public ResponseEntity<ErrorResponseDto> handleBookNotFoundException(BookNotFoundException e) {
+    log.warn("BookNotFoundException: {}", e.getMessage());
+
     ErrorResponseDto errorResponse = ErrorResponseDto.builder()
         .code(HttpStatus.NOT_FOUND)
         .title("BOOK_NOT_FOUND")
@@ -45,6 +49,8 @@ public class BookControllerExceptionHandler extends ResponseEntityExceptionHandl
    */
   @ExceptionHandler(Exception.class)
   public final ResponseEntity<ErrorResponseDto> handleAllExceptions(Exception e) {
+    log.error("Exception: {}", e.getMessage(), e);
+
     ErrorResponseDto errorResponse = ErrorResponseDto.builder()
         .code(HttpStatus.INTERNAL_SERVER_ERROR)
         .title("INTERNAL_SERVER_ERROR")

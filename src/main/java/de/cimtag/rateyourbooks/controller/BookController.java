@@ -6,6 +6,7 @@ import de.cimtag.rateyourbooks.service.BookService;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/books")
+@Slf4j
 public class BookController {
 
   private final BookService bookService;
@@ -39,12 +41,26 @@ public class BookController {
    */
   @GetMapping
   public ResponseEntity<List<BookDto>> searchBooks(@RequestParam(required = false) String title, @RequestParam(required = false) String author) {
+    log.info("Searching books with title '{}' and author '{}'", title, author);
+
+    List<BookDto> result;
     if (title != null && !title.isBlank()) {
-      return author != null && !author.isBlank() ? ResponseEntity.ok(List.of(bookService.findBookByTitleAndAuthor(title, author)))
-          : ResponseEntity.ok(List.of(bookService.findBookByTitle(title)));
+      if (author != null && !author.isBlank()) {
+        result = List.of(bookService.findBookByTitleAndAuthor(title, author));
+        log.info("Found books with title '{}' and author '{}': {}", title, author, result);
+      } else {
+        result = List.of(bookService.findBookByTitle(title));
+        log.info("Found books with title '{}': {}", title, result);
+      }
+    } else if (author != null && !author.isBlank()) {
+      result = bookService.findAllBooksByAuthor(author);
+      log.info("Found books with author '{}': {}", author, result);
+    } else {
+      result = bookService.findAllBooks();
+      log.info("Found all books: {}", result);
     }
 
-    return author != null && !author.isBlank() ? ResponseEntity.ok(bookService.findAllBooksByAuthor(author)) : ResponseEntity.ok(bookService.findAllBooks());
+    return ResponseEntity.ok(result);
   }
 
   /**
@@ -56,7 +72,10 @@ public class BookController {
    */
   @GetMapping("/{id}")
   public ResponseEntity<BookDto> findBookById(@PathVariable Long id) {
-    return ResponseEntity.ok(bookService.findBookById(id));
+    log.info("Finding book with ID '{}'", id);
+    BookDto bookDto = bookService.findBookById(id);
+    log.info("Found book with ID '{}': {}", id, bookDto);
+    return ResponseEntity.ok(bookDto);
   }
 
   /**
@@ -67,7 +86,9 @@ public class BookController {
    */
   @PostMapping
   public ResponseEntity<BookDto> createNewBook(@RequestBody BookDto bookDto) {
+    log.info("Creating new book: {}", bookDto);
     BookDto createdBook = bookService.createBook(bookDto);
+    log.info("Created new book: {}", createdBook);
     return ResponseEntity.created(URI.create("/api/books/" + createdBook.id())).body(createdBook);
   }
 
@@ -79,7 +100,9 @@ public class BookController {
    */
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+    log.info("Deleting book with ID '{}'", id);
     bookService.deleteBook(id);
+    log.info("Deleted book with ID '{}'", id);
     return ResponseEntity.ok().build();
   }
 
@@ -92,6 +115,9 @@ public class BookController {
    */
   @PutMapping("/{id}")
   public ResponseEntity<BookDto> updateBook(@PathVariable Long id, @RequestBody BookDto bookDto) {
-    return ResponseEntity.ok(bookService.updateBook(id, bookDto));
+    log.info("Updating book with ID '{}': {}", id, bookDto);
+    BookDto updatedBook = bookService.updateBook(id, bookDto);
+    log.info("Updated book with ID '{}': {}", id, updatedBook);
+    return ResponseEntity.ok(updatedBook);
   }
 }
