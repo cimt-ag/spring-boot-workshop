@@ -1,8 +1,14 @@
 package de.cimtag.rateyourbooks.controller;
 
 import de.cimtag.rateyourbooks.dto.BookDto;
+import de.cimtag.rateyourbooks.dto.ErrorResponseDto;
 import de.cimtag.rateyourbooks.exception.BookNotFoundException;
 import de.cimtag.rateyourbooks.service.BookService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +45,14 @@ public class BookController {
    * @param author the author of the book to search for (optional)
    * @return a list of books matching the search criteria
    */
+  @Operation(summary = "Search for books by title and/or author")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Found books matching the search criteria",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class))}
+      )
+  })
   @GetMapping
   public ResponseEntity<List<BookDto>> searchBooks(@RequestParam(required = false) String title, @RequestParam(required = false) String author) {
     log.info("Searching books with title '{}' and author '{}'", title, author);
@@ -70,6 +84,19 @@ public class BookController {
    * @return the book with the specified ID
    * @throws BookNotFoundException if no book with given ID can be found
    */
+  @Operation(summary = "Get a book by its ID")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Found the book",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class))}
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Book not found",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponseDto.class))}
+      )
+  })
   @GetMapping("/{id}")
   public ResponseEntity<BookDto> findBookById(@PathVariable Long id) {
     log.info("Finding book with ID '{}'", id);
@@ -84,6 +111,14 @@ public class BookController {
    * @param bookDto the details of the book to create
    * @return the newly created book
    */
+  @Operation(summary = "Create a new book")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "201",
+          description = "Book created successfully",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class))}
+      )
+  })
   @PostMapping
   public ResponseEntity<BookDto> createNewBook(@RequestBody BookDto bookDto) {
     log.info("Creating new book: {}", bookDto);
@@ -98,6 +133,19 @@ public class BookController {
    * @param id the ID of the book to delete
    * @return a response indicating the result of the deletion
    */
+  @Operation(summary = "Delete a book by its ID")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Book deleted successfully",
+          content = @Content
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Book not found",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponseDto.class))}
+      )
+  })
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
     log.info("Deleting book with ID '{}'", id);
@@ -113,6 +161,19 @@ public class BookController {
    * @param bookDto the updated details of the book
    * @return the updated book
    */
+  @Operation(summary = "Update an existing book")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Book updated successfully",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BookDto.class))}
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Book not found",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponseDto.class))}
+      )
+  })
   @PutMapping("/{id}")
   public ResponseEntity<BookDto> updateBook(@PathVariable Long id, @RequestBody BookDto bookDto) {
     log.info("Updating book with ID '{}': {}", id, bookDto);

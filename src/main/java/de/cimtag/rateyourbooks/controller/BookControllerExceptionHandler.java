@@ -5,8 +5,9 @@ import de.cimtag.rateyourbooks.exception.BookNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 
@@ -18,7 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  *
  * @author Niklas Witzel
  */
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 public class BookControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -29,6 +30,7 @@ public class BookControllerExceptionHandler extends ResponseEntityExceptionHandl
    * @return a ResponseEntity containing an {@link ErrorResponseDto} with details of the error
    */
   @ExceptionHandler(BookNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
   public ResponseEntity<ErrorResponseDto> handleBookNotFoundException(BookNotFoundException e) {
     log.warn("BookNotFoundException: {}", e.getMessage());
 
@@ -47,6 +49,7 @@ public class BookControllerExceptionHandler extends ResponseEntityExceptionHandl
    * @param e the exception thrown
    * @return a ResponseEntity containing an {@link ErrorResponseDto} with details of the error
    */
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(Exception.class)
   public final ResponseEntity<ErrorResponseDto> handleAllExceptions(Exception e) {
     log.error("Exception: {}", e.getMessage(), e);

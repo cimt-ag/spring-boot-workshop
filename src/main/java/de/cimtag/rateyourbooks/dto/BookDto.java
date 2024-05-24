@@ -1,6 +1,7 @@
 package de.cimtag.rateyourbooks.dto;
 
 import de.cimtag.rateyourbooks.model.Book;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 /**
@@ -12,7 +13,11 @@ import lombok.Builder;
  * @author Niklas Witzel
  */
 @Builder
-public record BookDto(Long id, String title, String author) {
+public record BookDto(
+    Long id,
+    @NotNull String title,
+    @NotNull String author
+) {
 
   /**
    * Converts this {@link BookDto} to a {@link Book} entity.
