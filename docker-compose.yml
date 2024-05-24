@@ -1,0 +1,19 @@
+version: '2.27.0'
+
+services:
+  db:
+    image: postgres:alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: rateyourbooks
+
+
+  api:
+    image: rateyourbooks
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    entrypoint: [ "sh", "-c", "until nc -z db 5432; do echo waiting for db; sleep 2; done; java -jar target/rate-your-books-0.0.1-SNAPSHOT.jar" ]
