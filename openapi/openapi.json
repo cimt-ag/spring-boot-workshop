@@ -40,20 +40,20 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Book not found",
+          "500": {
+            "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponseDto"
                 }
               }
             }
           },
-          "500": {
-            "description": "Internal Server Error",
+          "404": {
+            "description": "Book not found",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponseDto"
                 }
@@ -100,20 +100,20 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Book not found",
+          "500": {
+            "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponseDto"
                 }
               }
             }
           },
-          "500": {
-            "description": "Internal Server Error",
+          "404": {
+            "description": "Book not found",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponseDto"
                 }
@@ -150,20 +150,20 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Book not found",
+          "500": {
+            "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponseDto"
                 }
               }
             }
           },
-          "500": {
-            "description": "Internal Server Error",
+          "404": {
+            "description": "Book not found",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponseDto"
                 }
@@ -202,8 +202,8 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found",
+          "500": {
+            "description": "Internal Server Error",
             "content": {
               "*/*": {
                 "schema": {
@@ -212,8 +212,8 @@
               }
             }
           },
-          "500": {
-            "description": "Internal Server Error",
+          "404": {
+            "description": "Not Found",
             "content": {
               "*/*": {
                 "schema": {
@@ -251,8 +251,8 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Not Found",
+          "500": {
+            "description": "Internal Server Error",
             "content": {
               "*/*": {
                 "schema": {
@@ -261,8 +261,8 @@
               }
             }
           },
-          "500": {
-            "description": "Internal Server Error",
+          "404": {
+            "description": "Not Found",
             "content": {
               "*/*": {
                 "schema": {
@@ -304,22 +304,22 @@
       "HttpStatusCode": {
         "type": "object",
         "properties": {
-          "error": {
-            "type": "boolean"
-          },
-          "is1xxInformational": {
+          "is5xxServerError": {
             "type": "boolean"
           },
           "is4xxClientError": {
-            "type": "boolean"
-          },
-          "is5xxServerError": {
             "type": "boolean"
           },
           "is2xxSuccessful": {
             "type": "boolean"
           },
           "is3xxRedirection": {
+            "type": "boolean"
+          },
+          "is1xxInformational": {
+            "type": "boolean"
+          },
+          "error": {
             "type": "boolean"
           }
         }
